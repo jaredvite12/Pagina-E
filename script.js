@@ -100,3 +100,43 @@ if (carruselAuto) {
     }
   }, 3500);
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Buscamos todos los carruseles que haya en la página
+  const carruseles = document.querySelectorAll('.carrusel-contenedor');
+
+  carruseles.forEach(contenedor => {
+    const slide = contenedor.querySelector('.carrusel-slide');
+    const btnAnt = contenedor.querySelector('.ant');
+    const btnSig = contenedor.querySelector('.sig');
+    const imagenes = slide.querySelectorAll('img');
+    let indiceActual = 0;
+
+    // Si la tarjeta tiene botones y fotos, activamos la funcionalidad
+    if (slide && btnAnt && btnSig && imagenes.length > 0) {
+      
+      // Función para deslizar
+      function actualizarCarrusel() {
+        slide.style.transform = `translateX(-${indiceActual * 100}%)`;
+      }
+
+      // Botón Siguiente
+      btnSig.addEventListener('click', () => {
+        indiceActual++;
+        if (indiceActual >= imagenes.length) {
+          indiceActual = 0; // Si llega al final, regresa a la primera foto
+        }
+        actualizarCarrusel();
+      });
+
+      // Botón Anterior
+      btnAnt.addEventListener('click', () => {
+        indiceActual--;
+        if (indiceActual < 0) {
+          indiceActual = imagenes.length - 1; // Si está en la primera, va a la última
+        }
+        actualizarCarrusel();
+      });
+    }
+  });
+});
