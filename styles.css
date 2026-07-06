@@ -852,3 +852,53 @@ body {
 a {
     text-decoration: none;
 }
+
+/* Contenedor principal del carrusel */
+.carrusel-contenedor {
+  position: relative;
+  width: 100%;
+  overflow: hidden; /* Esconde las imágenes que no están en turno */
+  border-radius: 8px 8px 0 0; /* Mantiene las esquinas redondeadas de tu tarjeta */
+}
+
+/* Fila de imágenes que se desliza */
+.carrusel-slide {
+  display: flex;
+  transition: transform 0.4s ease-in-out;
+  width: 100%;
+}
+
+.carrusel-slide img {
+  width: 100%;
+  flex-shrink: 0;
+  object-fit: cover;
+  height: 250px; /* Puedes ajustar esta altura para que todas se vean parejas */
+}
+
+/* Botones flotantes (como los del inicio) */
+.carrusel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(3, 13, 31, 0.521); /* Azul marino semi-transparente */
+  color: white;
+  border: none;
+  font-size: 20px;
+  padding: 10px 14px;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+.carrusel-btn:hover {
+  background-color: #D4AF37; /* Se vuelve dorado al tocarlos */
+}
+
+.carrusel-btn.ant {
+  left: 10px; /* Separación del borde izquierdo */
+}
+
+.carrusel-btn.sig {
+  right: 10px; /* Separación del borde derecho */
+}
