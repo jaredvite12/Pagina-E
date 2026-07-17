@@ -12,15 +12,17 @@ function alternarMenu() {
     btnMenu.innerText = 'x';
   } else {
     fondoMenu.style.display = 'none';
-    btnMenu.innerText = '=';
+    btnMenu.innerText = '☰'; // Lo regresamos al icono de hamburguesa
   }
 }
 
-// Eventos para el menú hamburguesa
-btnMenu.addEventListener('click', alternarMenu);
-fondoMenu.addEventListener('click', alternarMenu);
+// Eventos para el menú hamburguesa (VERSIÓN SEGURA)
+if (btnMenu && fondoMenu && menuLateral) {
+    btnMenu.addEventListener('click', alternarMenu);
+    fondoMenu.addEventListener('click', alternarMenu);
+}
 
-// Lógica de los Acordeones (Habitaciones y Salones)
+// Lógica de los Acordeones 
 cabecerasAcordeon.forEach(cabecera => {
   cabecera.addEventListener('click', function() {
     const acordeonPadre = this.parentElement;
@@ -29,8 +31,8 @@ cabecerasAcordeon.forEach(cabecera => {
 });
 
 // Lógica para arrastrar el carrusel con el Mouse en PC
-const carruseles = document.querySelectorAll('.carrusel-swipe');
-carruseles.forEach(carrusel => {
+const carruselesSwipe = document.querySelectorAll('.carrusel-swipe');
+carruselesSwipe.forEach(carrusel => {
   let isDown = false;
   let startX;
   let scrollLeft;
@@ -71,19 +73,32 @@ carruseles.forEach(carrusel => {
   });
 });
 
-// Lógica para los botones del Carrusel de Servicios (Inicio)
-const carruselServicios = document.getElementById('carrusel-servicios');
-const btnIzqServicios = document.getElementById('btn-izq-servicios');
-const btnDerServicios = document.getElementById('btn-der-servicios');
+// --- EL CANDADO DE SEGURIDAD PARA LOS BOTONES ---
+// Función genérica para carruseles
+function configurarCarrusel(idCarrusel, idBtnIzq, idBtnDer) {
+  const carrusel = document.getElementById(idCarrusel);
+  const btnIzq = document.getElementById(idBtnIzq);
+  const btnDer = document.getElementById(idBtnDer);
 
-if (btnIzqServicios && btnDerServicios && carruselServicios) {
-  btnIzqServicios.addEventListener('click', () => {
-    carruselServicios.scrollBy({ left: -150, behavior: 'smooth' });
+  // LA MAGIA: Si no encuentra el carrusel o los botones en esta página, aborta la función y NO DA ERROR.
+  if (!carrusel || !btnIzq || !btnDer) return;
+
+  const desplazamiento = 150; // Un poco más suave el deslizamiento
+
+  btnIzq.addEventListener("click", () => {
+    carrusel.scrollBy({ left: -desplazamiento, behavior: "smooth" });
   });
-  btnDerServicios.addEventListener('click', () => {
-    carruselServicios.scrollBy({ left: 150, behavior: 'smooth' });
+
+  btnDer.addEventListener("click", () => {
+    carrusel.scrollBy({ left: desplazamiento, behavior: "smooth" });
   });
 }
+
+// Configurar carrusel de servicios (Funcionará solo en el Inicio)
+configurarCarrusel("carrusel-servicios", "btn-izq-servicios", "btn-der-servicios");
+
+// Configurar carrusel de filtros (Funcionará solo en Negocios)
+configurarCarrusel("carrusel-filtros", "btn-izq-filtros", "btn-der-filtros");
 
 // Lógica para el Carrusel Automático (Inicio)
 const carruselAuto = document.getElementById('carrusel-auto');
@@ -101,42 +116,71 @@ if (carruselAuto) {
   }, 3500);
 }
 
+// Carruseles individuales (Habitaciones)
 document.addEventListener('DOMContentLoaded', () => {
-  // Buscamos todos los carruseles que haya en la página
-  const carruseles = document.querySelectorAll('.carrusel-contenedor');
+  const carruselesContenedores = document.querySelectorAll('.carrusel-contenedor');
 
-  carruseles.forEach(contenedor => {
+  carruselesContenedores.forEach(contenedor => {
     const slide = contenedor.querySelector('.carrusel-slide');
     const btnAnt = contenedor.querySelector('.ant');
     const btnSig = contenedor.querySelector('.sig');
-    const imagenes = slide.querySelectorAll('img');
-    let indiceActual = 0;
+    
+    // Solo aplica si encontró todo en la tarjeta
+    if (slide && btnAnt && btnSig) {
+        const imagenes = slide.querySelectorAll('img');
+        let indiceActual = 0;
 
-    // Si la tarjeta tiene botones y fotos, activamos la funcionalidad
-    if (slide && btnAnt && btnSig && imagenes.length > 0) {
-      
-      // Función para deslizar
-      function actualizarCarrusel() {
-        slide.style.transform = `translateX(-${indiceActual * 100}%)`;
-      }
+        if (imagenes.length > 0) {
+          function actualizarCarrusel() {
+            slide.style.transform = `translateX(-${indiceActual * 100}%)`;
+          }
 
-      // Botón Siguiente
-      btnSig.addEventListener('click', () => {
-        indiceActual++;
-        if (indiceActual >= imagenes.length) {
-          indiceActual = 0; // Si llega al final, regresa a la primera foto
+          btnSig.addEventListener('click', () => {
+            indiceActual++;
+            if (indiceActual >= imagenes.length) {
+              indiceActual = 0;
+            }
+            actualizarCarrusel();
+          });
+
+          btnAnt.addEventListener('click', () => {
+            indiceActual--;
+            if (indiceActual < 0) {
+              indiceActual = imagenes.length - 1;
+            }
+            actualizarCarrusel();
+          });
         }
-        actualizarCarrusel();
-      });
-
-      // Botón Anterior
-      btnAnt.addEventListener('click', () => {
-        indiceActual--;
-        if (indiceActual < 0) {
-          indiceActual = imagenes.length - 1; // Si está en la primera, va a la última
-        }
-        actualizarCarrusel();
-      });
     }
   });
+});
+
+// --- LÓGICA DE FILTROS (Solo para negocios.html) ---
+document.addEventListener("DOMContentLoaded", () => {
+    const botonesFiltro = document.querySelectorAll(".btn-filtro");
+    const tarjetas = document.querySelectorAll(".tarjeta-hibrida");
+
+    // EL CANDADO: Si hay botones de filtro en esta página, entonces activa la lógica
+    if (botonesFiltro.length > 0) {
+        botonesFiltro.forEach(boton => {
+            boton.addEventListener("click", () => {
+                // Quitar activo a todos y poner al presionado
+                botonesFiltro.forEach(b => b.classList.remove("active"));
+                boton.classList.add("active");
+
+                const filtroActivo = boton.getAttribute("data-categoria");
+
+                tarjetas.forEach(tarjeta => {
+                    const catTarjeta = tarjeta.getAttribute("data-cat");
+                    
+                    // Si es "todos" o coincide la categoría, se muestra
+                    if (filtroActivo === "todos" || catTarjeta === filtroActivo) {
+                        tarjeta.style.display = "block";
+                    } else {
+                        tarjeta.style.display = "none";
+                    }
+                });
+            });
+        });
+    }
 });
